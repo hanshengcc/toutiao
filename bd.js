@@ -11134,7 +11134,7 @@ window.bdms || function () {
         window.bdms = a
 }();
 
-function getLink(channel_id){
+function getLink(channel_id) {
     const args = [
         0,
         1,
@@ -11146,9 +11146,9 @@ function getLink(channel_id){
     const e = window._U;
     const r = window._U._v;
     ab = window._U._u(r[0], args, r[1], r[2], null)
-    
+
     // console.log(`length:${ab.length},value:${ab}`)
-    
+
     link = `https://www.toutiao.com/api/pc/list/feed?${args[3]}&a_bogus=${ab}`
     return link;
 }
@@ -11211,16 +11211,16 @@ function getLink(channel_id){
 
 //     // console.log(cookieResponse.headers["set-cookie"][0].split(";"))
 
-    // const htmlResponse = await axios.get("https://toutiao.com/group/7416265862501401122/", { responseType: "text",headers:{
-    //     "Cookie": ttwid.trim()
-    // } })
+// const htmlResponse = await axios.get("https://toutiao.com/group/7416265862501401122/", { responseType: "text",headers:{
+//     "Cookie": ttwid.trim()
+// } })
 
-    // const { window: { document } } = new JSDOM(htmlResponse.data)
+// const { window: { document } } = new JSDOM(htmlResponse.data)
 
-    // title = document.querySelector("h1").textContent
-    // acticel = document.querySelector("article").outerHTML
+// title = document.querySelector("h1").textContent
+// acticel = document.querySelector("article").outerHTML
 
-    // console.log(title)
+// console.log(title)
 // })()
 
 
@@ -11228,7 +11228,6 @@ function getLink(channel_id){
 const express = require('express')
 const app = express()
 
-let ttwid = null;
 const channels = {
     // 财经
     finance: '3189399007',
@@ -11269,41 +11268,45 @@ app.get('/', (req, res) => {
     return res.json(channels)
 })
 
-app.get('/:id', async (req,res)=>{
-    if(ttwid == null){
-        const response = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
-            "aid": 24,
-            "service": "www.toutiao.com",
-            "region": "cn",
-            "union": true,
-            "needFid": false
-        }, {
-            responseType: "json"
-        })
-        redirect_url = response.data.redirect_url
-    
-        const cookieResponse  = await axios.get(redirect_url)
-        const [subTtwid] = cookieResponse.headers["set-cookie"][0].split(";")
-        ttwid = subTtwid;
-    }
+app.get('/:id', async (req, res) => {
+
+    const responseRegister = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
+        "aid": 24,
+        "service": "www.toutiao.com",
+        "region": "cn",
+        "union": true,
+        "needFid": false
+    }, {
+        responseType: "json"
+    })
+    redirect_url = responseRegister.data.redirect_url
+
+    const cookieResponse = await axios.get(redirect_url)
+    const [ttwid] = cookieResponse.headers["set-cookie"][0].split(";")
+
+
 
     const link = await getLink(req.params.id)
-    const response = await axios.get(link,{responseType:"json",headers:{
-        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
-    }})
+    const response = await axios.get(link, {
+        responseType: "json", headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
+        }
+    })
     // console.log(response.data)
-    if(response.data?.message == "success") {
+    if (response.data?.message == "success") {
         acticlePromises = response.data?.data.map(async post => {
-            const htmlResponse = await axios.get(post.article_url, { responseType: "text",headers:{
-                "Cookie": ttwid.trim(),
-                "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
-            } })
-        
+            const htmlResponse = await axios.get(post.article_url, {
+                responseType: "text", headers: {
+                    "Cookie": ttwid.trim(),
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
+                }
+            })
+
             const { window: { document } } = new JSDOM(htmlResponse.data)
             console.log(document.title)
             const title = document.querySelector("h1")?.textContent
             const article = document.querySelector("article")?.outerHTML
-        
+
             post.title = title
             post.article = article
             return post
@@ -11314,8 +11317,10 @@ app.get('/:id', async (req,res)=>{
 
         return res.json(articles)
     }
+
+    return res.status(500).send("超时")
 })
 
-
-
-app.listen(3000)
+const port = process.env.port ?? 3899
+console.log("server start at ", port," default: 3389")
+app.listen(port)
