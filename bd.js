@@ -1,7 +1,7 @@
-const { default: axios } = require("axios")
+const axios = require("axios")
 const { JSDOM } = require("jsdom")
 const crypto = require("crypto")
-
+const https = require("https")
 
 let { window } = new JSDOM('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Document</title></head><body></body></html>', {
     referrer: "https://www.toutiao.com/",
@@ -11218,29 +11218,38 @@ app.get('/', (req, res) => {
 })
 
 
+let tt_webid = null;
+let ttwid = null;
 
-// axios.defaults.adapter = createHTTP2Adapter();
 app.get('/:id', async (req, res) => {
-    const responseRegister = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
-        "aid": 24,
-        "service": "www.toutiao.com",
-        "region": "cn",
-        "union": true,
-        "needFid": false
-    }, {
-        responseType: "json"
-    })
-    redirect_url = responseRegister.data.redirect_url
+    if(ttwid == null){
+        const responseRegister = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
+            "aid": 24,
+            "service": "www.toutiao.com",
+            "region": "cn",
+            "union": true,
+            "needFid": false
+        }, {
+            responseType: "json"
+        })
+        redirect_url = responseRegister.data.redirect_url
+    
+        const cookieResponse = await axios.get(redirect_url)
+        const [subttwid] = cookieResponse.headers["set-cookie"][0].split(";")
+        ttwid = subttwid;
+    }
 
-    const cookieResponse = await axios.get(redirect_url)
-    const [ttwid] = cookieResponse.headers["set-cookie"][0].split(";")
 
-    const indexResponse = await axios.get("https://www.toutiao.com",{
-        headers:{
-            "Cookie": ttwid,
-        }
-    })
-    const [tt_webid] = indexResponse.headers["set-cookie"][0].split(";")
+    if(tt_webid == null){
+        const indexResponse = await axios.get("https://www.toutiao.com",{
+            headers:{
+                "Cookie": ttwid,
+            }
+        })
+        const [subtt_webid] = indexResponse.headers["set-cookie"][0].split(";")
+        tt_webid = subtt_webid;
+    }
+
 
     const link = await getLink(req.params.id)
 
@@ -11249,12 +11258,19 @@ app.get('/:id', async (req, res) => {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
             "Cookie": tt_webid
         },
+        httpsAgent: new https.Agent({
+            rejectUnauthorized:false
+        })
+        // proxy: {
+        //     host:"127.0.0.1",
+        //     port:8080
+        // }
     })
 
-    // console.log(response.data)
-    console.log(response.data?.data?.map(post => {
-        return post.Abstract
-    }))
+
+    // console.log(response.data?.data?.map(post => {
+    //     return post.Abstract
+    // }))
     if (response.data?.message == "success") {
         acticlePromises = response.data?.data.map(async post => {
             try {
@@ -11286,6 +11302,7 @@ app.get('/:id', async (req, res) => {
 
     return res.status(500).send("头条返回无效响应")
 })
+
 
 const port = process.env.port ?? 3899
 console.log("server start at ", port, " default: 3899")
