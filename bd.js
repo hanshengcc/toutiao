@@ -1,5 +1,6 @@
 const { default: axios } = require("axios")
 const { JSDOM } = require("jsdom")
+const crypto = require("crypto")
 
 
 let { window } = new JSDOM('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Document</title></head><body></body></html>', {
@@ -11134,98 +11135,46 @@ window.bdms || function () {
         window.bdms = a
 }();
 
+const r = window._U._v;
+
+function generateRandomString(length) {
+    return crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex') // 将字节转换为十六进制字符串
+        .slice(0, length); // 截取到指定长度
+}
 function getLink(channel_id) {
+    const msToken = generateRandomString(120)
+    // const msToken = "CPxYiuu5VQ00dTnCjJ4UWb_Kckmc27lnoH5bqsmKBZbHtPTgjpWrqjnatbbMVuOlhqGWk2tqg7aiVem7jZVZ4748EWC3udagIOwRWeQDabIaAEgYXy6wNw=="
+    const hotTime = Math.floor(new Date().getTime()/1000)
     const args = [
         0,
         1,
         8,
-        `channel_id=${channel_id}&min_behot_time=1729426963&offset=0&refresh_count=9&category=pc_profile_channel&client_extra_params=%7B%22short_video_item%22%3A%22filter%22%7D&aid=24&app_name=toutiao_web&msToken=Yz3B_OkA9NqlwgqMDDW5Nz8Ff7uXVXcEkyqBYFzZC0AvVOn_1_mZZj0oPKPYSa4UUwNrO2l7Ub85ZS5Iwqh-6CCbvX7XWWbQoFSjXD5CyqFA-Npeh6TvhlMidJQYCLA%3D&msToken=Yz3B_OkA9NqlwgqMDDW5Nz8Ff7uXVXcEkyqBYFzZC0AvVOn_1_mZZj0oPKPYSa4UUwNrO2l7Ub85ZS5Iwqh-6CCbvX7XWWbQoFSjXD5CyqFA-Npeh6TvhlMidJQYCLA%3D`,
+        `channel_id=${channel_id}&min_behot_time=${hotTime}&offset=0&refresh_count=${Math.floor(Math.random()*10)}&category=pc_profile_channel&client_extra_params=%7B%22short_video_item%22%3A%22filter%22%7D&aid=24&app_name=toutiao_web&msToken=${msToken}`,
         "",
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
     ]
-    const e = window._U;
-    const r = window._U._v;
-    ab = window._U._u(r[0], args, r[1], r[2], null)
+    // const e = window._U;
+    // const r = window._U._v;
+    const ab = window._U._u(r[0], args, r[1], r[2], null)
 
+    // for(let i=0;i<10;i++){
+    //     ab = window._U._u(r[0], args, r[1], r[2], null)
+    //     console.log("ab",ab)
+    // }
     // console.log(`length:${ab.length},value:${ab}`)
 
     link = `https://www.toutiao.com/api/pc/list/feed?${args[3]}&a_bogus=${ab}`
     return link;
 }
-// const args = [
-//     0,
-//     1,
-//     8,
-//     "channel_id=3189398957&min_behot_time=1729426963&offset=0&refresh_count=9&category=pc_profile_channel&client_extra_params=%7B%22short_video_item%22%3A%22filter%22%7D&aid=24&app_name=toutiao_web&msToken=Yz3B_OkA9NqlwgqMDDW5Nz8Ff7uXVXcEkyqBYFzZC0AvVOn_1_mZZj0oPKPYSa4UUwNrO2l7Ub85ZS5Iwqh-6CCbvX7XWWbQoFSjXD5CyqFA-Npeh6TvhlMidJQYCLA%3D&msToken=Yz3B_OkA9NqlwgqMDDW5Nz8Ff7uXVXcEkyqBYFzZC0AvVOn_1_mZZj0oPKPYSa4UUwNrO2l7Ub85ZS5Iwqh-6CCbvX7XWWbQoFSjXD5CyqFA-Npeh6TvhlMidJQYCLA%3D",
-//     "",
-//     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
-// ]
-// const e = window._U;
-// const r = window._U._v;
-// ab = window._U._u(r[0], args, r[1], r[2], null)
-
-// console.log(`length:${ab.length},value:${ab}`)
-
-// link = `https://www.toutiao.com/api/pc/list/feed?${args[3]}&a_bogus=${ab}`
-
-// console.log(link);
-
-// const { exec } = require('child_process');
-// const { default: axios } = require("axios")
-// const openCommand = process.platform === 'win32' ? 'start' :
-//                     process.platform === 'darwin' ? 'open' :
-//                     'xdg-open';
-
-// exec(`${openCommand} "${link}"`, (err) => {
-//   if (err) {
-//     console.error('打开网址时出错:', err);
-//   } else {
-//     console.log('成功打开网址:', url);
-//   }
-// });
-//注册ttwid
-
-// (async function lookup() {
-
-//     // 创建 Axios 实例
-
-
-//     // axios.defaults.proxy = {
-//     //     port: 8080,
-//     //     host: "127.0.0.1"
-//     // }
-//     // axios.defaults.withCredentials = true;
-//     const response = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
-//         "aid": 24,
-//         "service": "www.toutiao.com",
-//         "region": "cn",
-//         "union": true,
-//         "needFid": false
-//     }, {
-//         responseType: "json"
-//     })
-//     redirect_url = response.data.redirect_url
-
-//     const cookieResponse  = await axios.get(redirect_url)
-//     const [ttwid] = cookieResponse.headers["set-cookie"][0].split(";")
-
-//     // console.log(cookieResponse.headers["set-cookie"][0].split(";"))
-
-// const htmlResponse = await axios.get("https://toutiao.com/group/7416265862501401122/", { responseType: "text",headers:{
-//     "Cookie": ttwid.trim()
-// } })
-
-// const { window: { document } } = new JSDOM(htmlResponse.data)
-
-// title = document.querySelector("h1").textContent
-// acticel = document.querySelector("article").outerHTML
-
-// console.log(title)
-// })()
 
 
 
-const express = require('express')
+
+const express = require('express');
+const { connect } = require("http2");
+const { url } = require("inspector");
+const { URL } = require("url");
 const app = express()
 
 const channels = {
@@ -11268,8 +11217,10 @@ app.get('/', (req, res) => {
     return res.json(channels)
 })
 
-app.get('/:id', async (req, res) => {
 
+
+// axios.defaults.adapter = createHTTP2Adapter();
+app.get('/:id', async (req, res) => {
     const responseRegister = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
         "aid": 24,
         "service": "www.toutiao.com",
@@ -11284,32 +11235,47 @@ app.get('/:id', async (req, res) => {
     const cookieResponse = await axios.get(redirect_url)
     const [ttwid] = cookieResponse.headers["set-cookie"][0].split(";")
 
-
-
-    const link = await getLink(req.params.id)
-    const response = await axios.get(link, {
-        responseType: "json", headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
+    const indexResponse = await axios.get("https://www.toutiao.com",{
+        headers:{
+            "Cookie": ttwid,
         }
     })
+    const [tt_webid] = indexResponse.headers["set-cookie"][0].split(";")
+
+    const link = await getLink(req.params.id)
+
+    const response = await axios.get(link, {
+        responseType: "json", headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
+            "Cookie": tt_webid
+        },
+    })
+
     // console.log(response.data)
+    console.log(response.data?.data?.map(post => {
+        return post.Abstract
+    }))
     if (response.data?.message == "success") {
         acticlePromises = response.data?.data.map(async post => {
-            const htmlResponse = await axios.get(post.article_url, {
-                responseType: "text", headers: {
-                    "Cookie": ttwid.trim(),
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
-                }
-            })
+            try {
+                const htmlResponse = await axios.get(post.article_url, {
+                    responseType: "text", headers: {
+                        "Cookie": ttwid.trim(),
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
+                    }
+                })
 
-            const { window: { document } } = new JSDOM(htmlResponse.data)
-            console.log(document.title)
-            const title = document.querySelector("h1")?.textContent
-            const article = document.querySelector("article")?.outerHTML
+                const { window: { document } } = new JSDOM(htmlResponse.data)
+                // console.log(document.title)
+                const title = document.querySelector("h1")?.textContent
+                const article = document.querySelector("article")?.outerHTML
 
-            post.title = title
-            post.article = article
-            return post
+                post.title = title
+                post.article = article
+                return post
+            } catch (ex) {
+                return post
+            }
         })
 
         const articles = await Promise.all(acticlePromises)
@@ -11318,9 +11284,9 @@ app.get('/:id', async (req, res) => {
         return res.json(articles)
     }
 
-    return res.status(500).send("超时")
+    return res.status(500).send("头条返回无效响应")
 })
 
 const port = process.env.port ?? 3899
-console.log("server start at ", port," default: 3389")
+console.log("server start at ", port, " default: 3899")
 app.listen(port)
