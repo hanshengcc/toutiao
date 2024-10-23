@@ -18,16 +18,16 @@ navigator = {
 }
 
 window.requestAnimationFrame = (arg) => {
-    console.log(`对象: window, 方法: requestAnimationFrame, 参数: ${arg}`)
+    // console.log(`对象: window, 方法: requestAnimationFrame, 参数: ${arg}`)
 }
 window.fetch = (arg, arg1) => {
-    console.log(`对象: window, 方法: fetch, 参数: ${arg},参数1: ${arg1}`)
+    // console.log(`对象: window, 方法: fetch, 参数: ${arg},参数1: ${arg1}`)
 }
 
 
 window.EventSource = class EventSource {
     constructor(arg) {
-        console.log(`对象: window, 方法: EventSource, 参数: ${arg},参数1: ${arg1}`)
+        // console.log(`对象: window, 方法: EventSource, 参数: ${arg},参数1: ${arg1}`)
     }
 }
 window.onwheelx = {
@@ -11171,139 +11171,7 @@ function getLink(channel_id) {
 
 
 
-const express = require('express');
-const { connect } = require("http2");
-const { url } = require("inspector");
-const { URL } = require("url");
-const app = express()
-
-const channels = {
-    // 财经
-    finance: '3189399007',
-    // 科技
-    technology: '3189398999',
-    //热点
-    hot: '3189398996',
-    // 国际
-    international: '3189398968',
-    // 军事
-    military: '3189398960',
-    // 体育
-    sports: '3189398957',
-    // 娱乐
-    entertainment: '3189398972',
-    // 数码
-    digital: '3189398981',
-    // 历史
-    history: '3189398965',
-    // 美食
-    food: '3189399002',
-    // 游戏
-    games: '3189398995',
-    // 旅游
-    travel: '3189398983',
-    // 养生
-    health: '3189398959',
-    // 时尚
-    fashion: '3189398984',
-    // 育儿
-    parenting: '3189399004',
-    // 视频
-    video: '3431225546',
+module.exports = {
+    getLink,
 }
 
-
-app.get('/', (req, res) => {
-    return res.json(channels)
-})
-
-
-let tt_webid = null;
-let ttwid = null;
-
-app.get('/:id', async (req, res) => {
-    if(ttwid == null){
-        const responseRegister = await axios.post("https://ttwid.bytedance.com/ttwid/union/register/", {
-            "aid": 24,
-            "service": "www.toutiao.com",
-            "region": "cn",
-            "union": true,
-            "needFid": false
-        }, {
-            responseType: "json"
-        })
-        redirect_url = responseRegister.data.redirect_url
-    
-        const cookieResponse = await axios.get(redirect_url)
-        const [subttwid] = cookieResponse.headers["set-cookie"][0].split(";")
-        ttwid = subttwid;
-    }
-
-
-    if(tt_webid == null){
-        const indexResponse = await axios.get("https://www.toutiao.com",{
-            headers:{
-                "Cookie": ttwid,
-            }
-        })
-        const [subtt_webid] = indexResponse.headers["set-cookie"][0].split(";")
-        tt_webid = subtt_webid;
-    }
-
-
-    const link = await getLink(req.params.id)
-
-    const response = await axios.get(link, {
-        responseType: "json", headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
-            "Cookie": tt_webid
-        },
-        httpsAgent: new https.Agent({
-            rejectUnauthorized:false
-        })
-        // proxy: {
-        //     host:"127.0.0.1",
-        //     port:8080
-        // }
-    })
-
-
-    // console.log(response.data?.data?.map(post => {
-    //     return post.Abstract
-    // }))
-    if (response.data?.message == "success") {
-        acticlePromises = response.data?.data.map(async post => {
-            try {
-                const htmlResponse = await axios.get(post.article_url, {
-                    responseType: "text", headers: {
-                        "Cookie": ttwid.trim(),
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
-                    }
-                })
-
-                const { window: { document } } = new JSDOM(htmlResponse.data)
-                // console.log(document.title)
-                const title = document.querySelector("h1")?.textContent
-                const article = document.querySelector("article")?.outerHTML
-
-                post.title = title
-                post.article = article
-                return post
-            } catch (ex) {
-                return post
-            }
-        })
-
-        const articles = await Promise.all(acticlePromises)
-        // console.log('articles',articles)
-
-        return res.json(articles)
-    }
-
-    return res.status(500).send("头条返回无效响应")
-})
-
-
-const port = process.env.port ?? 3899
-console.log("server start at ", port, " default: 3899")
-app.listen(port)

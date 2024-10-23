@@ -1,7 +1,3 @@
-const {JSDOM} = require("jsdom")
-let {window} = new JSDOM("");
-
-let {document} = window
 
 function get_enviroment(proxy_array) {
     for (var i = 0; i < proxy_array.length; i++) {
