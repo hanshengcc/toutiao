@@ -48,7 +48,7 @@ async function getNonce(){
             }
         })
 
-        __ac_nonce = response.headers["set-cookie"]?.[0]?.split(";")?.[0]?.split("=")?.[1] ?? "0671935fe00b92ae09b66"
+        __ac_nonce = response.headers["set-cookie"]?.[0]?.split(";")?.[0]?.split("=")?.[1] ?? response.data.match(/nonce="([^"]+)"/)[1] ?? "0671935fe00b92ae09b66"
     }
     console.log(new Date().toLocaleString(),` __ac_nonce:`,__ac_nonce)
     return __ac_nonce
