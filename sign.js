@@ -714,6 +714,7 @@ document.createElement = (arg)=>{
 async function getsignature(){
     const nonce = await getNonce()
     const sign = window.byted_acrawler.sign("", nonce)
+    console.log(new Date().toLocaleString(),` nonce`,nonce, ` sign:`,sign)
     return sign;
 }
 
