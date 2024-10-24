@@ -19,6 +19,7 @@ async function getTTwid(){
         const [subttwid] = cookieResponse.headers["set-cookie"][0].split(";")
         ttwid = subttwid;
     }
+    console.log(new Date().toLocaleString(),` ttwid:`,ttwid)
     return ttwid;
 }
 
@@ -33,6 +34,7 @@ async function getTTwebid(){
         const [subtt_webid] = indexResponse.headers["set-cookie"][0].split(";")
         tt_webid = subtt_webid;
     }
+    console.log(new Date().toLocaleString(),` tt_webid:`,tt_webid)
     return tt_webid
 }
 let __ac_nonce = null
@@ -40,11 +42,15 @@ let __ac_nonce = null
 async function getNonce(){
     if(__ac_nonce == null){
         const link = `https://so.toutiao.com/search`
-        const response = await axios.get(link)
+        const response = await axios.get(link,{
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
+            }
+        })
 
-        __ac_nonce = response.headers["set-cookie"][0].split(";")[0].split("=")[1];
+        __ac_nonce = response.headers["set-cookie"]?.[0]?.split(";")?.[0]?.split("=")?.[1] ?? "0671935fe00b92ae09b66"
     }
-
+    console.log(new Date().toLocaleString(),` __ac_nonce:`,__ac_nonce)
     return __ac_nonce
 }
 module.exports = {
