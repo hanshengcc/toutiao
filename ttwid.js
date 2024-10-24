@@ -41,7 +41,7 @@ let __ac_nonce = null
 // let __ac_nonce = "0671935fe00b92ae09b66"
 async function getNonce(){
     if(__ac_nonce == null){
-        const link = `https://so.toutiao.com/search`
+        const link = `https://so.toutiao.com/search?dvpf=pc&source=search_subtab_switch&keyword=%E7%8B%AC%E8%A1%8C%E6%9C%88%E7%90%83&pd=information&action_type=search_subtab_switch&page_num=0&search_id=&from=news&cur_tab_title=news`
         const response = await axios.get(link,{
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
