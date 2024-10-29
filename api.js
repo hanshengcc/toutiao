@@ -128,8 +128,8 @@ app.get('/search/:kw', async (req,res) => {
     // console.log("title:",document.title)
 
     const resultsPromise = [...document.querySelectorAll(".result-content")].map(async node => {
-        const searchTitle = document.querySelector(".cs-header").textContent;
-        const link = document.querySelector(".cs-header").querySelector("a").getAttribute("href");
+        const searchTitle = node.querySelector(".cs-header").textContent;
+        const link = node.querySelector(".cs-header").querySelector("a").getAttribute("href");
 
         const tempUrl = new URL("https://so.toutiao.com"+link)
 
@@ -143,7 +143,7 @@ app.get('/search/:kw', async (req,res) => {
         
         const {window:{document:artdocument}} = new JSDOM(response.data)
 
-        const title = artdocument.title
+        const title = artdocument.querySelector("h1").textContent
         const article = artdocument.querySelector("article").outerHTML
 
         return {searchTitle,title,article}
