@@ -153,7 +153,7 @@ app.get('/search/:kw', async (req, res) => {
         }
     })
 
-    return res.json(await Promise.all(resultsPromise))
+    return res.json((await Promise.all(resultsPromise)).filter(item => item != null))
 })
 
 const port = process.env.port ?? 3899
