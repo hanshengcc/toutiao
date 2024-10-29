@@ -1,7 +1,7 @@
 const express = require('express');
-const {getLink} = require("./bd.js")
+const { getLink } = require("./bd.js")
 const axios = require("axios")
-const {JSDOM} = require("jsdom")
+const { JSDOM } = require("jsdom")
 const {
     getTTwid,
     getTTwebid,
@@ -108,10 +108,10 @@ app.get('/channel/:id', async (req, res) => {
     return res.status(500).send("头条返回无效响应")
 })
 
-app.get('/search/:kw', async (req,res) => {
+app.get('/search/:kw', async (req, res) => {
     const word = req.params.kw
-    const response = await axios.get(`https://so.toutiao.com/search?dvpf=pc&source=input&keyword=${word}&pd=information&action_type=pagination&page_num=0&from=news&cur_tab_title=news`,{
-        headers:{
+    const response = await axios.get(`https://so.toutiao.com/search?dvpf=pc&source=input&keyword=${word}&pd=information&action_type=pagination&page_num=0&from=news&cur_tab_title=news`, {
+        headers: {
             "Cookie": `__ac_signature=${await getsignature()};__ac_nonce=${await getNonce()}`,
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
         },
@@ -119,7 +119,7 @@ app.get('/search/:kw', async (req,res) => {
     })
     // console.log(response.request._header)
     // console.log(response.data)
-    const {window:{document}} = new JSDOM(response.data)
+    const { window: { document } } = new JSDOM(response.data)
 
     // document.querySelectorAll(".result-content").map(node => {
     //     console.log(node.textContent)
@@ -128,27 +128,31 @@ app.get('/search/:kw', async (req,res) => {
     // console.log("title:",document.title)
 
     const resultsPromise = [...document.querySelectorAll(".result-content[data-i]")].map(async node => {
-        const searchTitle = node.querySelector(".cs-header").textContent;
-        const link = node.querySelector(".cs-header").querySelector("a").getAttribute("href");
+        try {
+            const searchTitle = node.querySelector(".cs-header").textContent;
+            const link = node.querySelector(".cs-header").querySelector("a").getAttribute("href");
 
-        const tempUrl = new URL("https://so.toutiao.com"+link)
+            const tempUrl = new URL("https://so.toutiao.com" + link)
 
-        const response = await axios.get(tempUrl.searchParams.get("url"),{
-            headers: {
-                "Cookie": `${await getTTwid()}`,
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
-            },
-        })
-        // console.log(response.request._header)
-        
-        const {window:{document:artdocument}} = new JSDOM(response.data)
+            const response = await axios.get(tempUrl.searchParams.get("url"), {
+                headers: {
+                    "Cookie": `${await getTTwid()}`,
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
+                },
+            })
+            // console.log(response.request._header)
 
-        const title = artdocument.querySelector("h1").textContent
-        const article = artdocument.querySelector("article").outerHTML
+            const { window: { document: artdocument } } = new JSDOM(response.data)
 
-        return {searchTitle,title,article}
+            const title = artdocument.querySelector("h1").textContent
+            const article = artdocument.querySelector("article").outerHTML
+
+            return { searchTitle, title, article }
+        } catch (ex) {
+            return null;
+        }
     })
-    
+
     return res.json(await Promise.all(resultsPromise))
 })
 
