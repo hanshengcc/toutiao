@@ -127,7 +127,7 @@ app.get('/search/:kw', async (req,res) => {
 
     // console.log("title:",document.title)
 
-    const resultsPromise = [...document.querySelectorAll(".result-content")].map(async node => {
+    const resultsPromise = [...document.querySelectorAll(".result-content[data-i]")].map(async node => {
         const searchTitle = node.querySelector(".cs-header").textContent;
         const link = node.querySelector(".cs-header").querySelector("a").getAttribute("href");
 
