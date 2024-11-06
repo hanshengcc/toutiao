@@ -96,6 +96,7 @@ app.get('/channel/:id', async (req, res) => {
                 post.article = article
                 return post
             } catch (ex) {
+                console.log(`ex:${ex}`)
                 return post
             }
         })
