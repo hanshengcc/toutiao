@@ -79,7 +79,6 @@ app.get('/channel/:id', async (req, res) => {
     if (response.data?.message == "success") {
         acticlePromises = response.data?.data.map(async post => {
             try {
-                console.log(`get article_url: ${post.article_url}`)
                 const htmlResponse = await axios.get(post.article_url, {
                     responseType: "text", headers: {
                         "Cookie": ttwid.trim(),
